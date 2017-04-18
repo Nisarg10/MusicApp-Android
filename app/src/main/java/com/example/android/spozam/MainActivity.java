@@ -51,7 +51,12 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
         AuthenticationRequest.Builder builder = new AuthenticationRequest.Builder(CLIENT_ID,
                 AuthenticationResponse.Type.TOKEN,
                 REDIRECT_URI);
-        builder.setScopes(new String[]{"user-read-private", "streaming"});
+        builder.setScopes(new String[]{"user-read-private",
+                "streaming",
+                "playlist-read-private",
+                "user-follow-read",
+                "user-library-read",
+                "user-top-read"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);
@@ -60,27 +65,12 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Intent intent = new Intent(this, HomeActivity.class);
-        startActivity(intent);
+
         if (requestCode == REQUEST_CODE) {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, data);
-            Log.d("MainActivity", "Received Token: " + response.getAccessToken());
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                Config playerConfig = new Config(this, response.getAccessToken(), CLIENT_ID);
-                Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
-                    @Override
-                    public void onInitialized(SpotifyPlayer spotifyPlayer) {
-                        mPlayer = spotifyPlayer;
-                        mPlayer.addConnectionStateCallback(MainActivity.this);
-                        mPlayer.addNotificationCallback(MainActivity.this);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        Log.e("MainActivity", "Could not initialized player: " + throwable.getMessage());
-                    }
-                });
-            }
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.putExtra("access-token", response.getAccessToken().toString());
+            startActivity(intent);
         }
 
         finish();
@@ -115,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
     public void onPlaybackEvent(PlayerEvent playerEvent) {
         Log.d("MainActivity", "Playback event received: " + playerEvent.name());
         switch (playerEvent) {
-
             default:
                 break;
         }
