@@ -25,10 +25,20 @@
         android:layout_height="wrap_content"
         android:text="Artists"
         android:padding="8dp"/>
+
     <TextView
         android:id="@+id/tv_songs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Songs"
         android:padding="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recemtly played"
+        android:paddingLeft="8dp"/>
+
+    <include layout="@layout/list_view" />
+
 </LinearLayout>

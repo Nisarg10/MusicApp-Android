@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements SpotifyPlayer.Not
                 "playlist-read-private",
                 "user-follow-read",
                 "user-library-read",
-                "user-top-read"});
+                "user-top-read",
+                "user-read-recently-played"});
         AuthenticationRequest request = builder.build();
 
         AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request);

@@ -26,7 +26,6 @@ public final class QueryUtils {
 
     private static String LOG_TAG = QueryUtils.class.getSimpleName();
 
-
     public static List<String> fetchData(String dataRequested, String accessToken) {
 
         URL url = createUrl(dataRequested);
@@ -38,7 +37,7 @@ public final class QueryUtils {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
 
-        List<String> userPlaylists = fetchPlaylist(jsonResponse);
+        List<String> userPlaylists = fetchRecentlyPlayed(jsonResponse);
 
         return userPlaylists;
     }
@@ -110,23 +109,24 @@ public final class QueryUtils {
         return output.toString();
     }
 
-    private static List<String> fetchPlaylist(String jsonResponse) {
+    private static List<String> fetchRecentlyPlayed(String jsonResponse) {
 
-        List<String> userPlaylists = new ArrayList<>();
+        List<String> recentlyPlayedList = new ArrayList<>();
 
         try
         {
             JSONObject paredJsonObject = new JSONObject(jsonResponse);
-            JSONArray earthQuakeArrays = paredJsonObject.getJSONArray("items");
+            JSONArray recentlyPlayedArrays = paredJsonObject.getJSONArray("items");
 
 
-            for (int i = 0; i < earthQuakeArrays.length(); i++) {
+            for (int i = 0; i < recentlyPlayedArrays.length(); i++) {
 
-                JSONObject temp = earthQuakeArrays.getJSONObject(i);
+                JSONObject tracks = recentlyPlayedArrays.getJSONObject(i);
+                JSONObject track = tracks.getJSONObject("track");
 
-                String playlistName = temp.getString("name");
+                String nameOfTrack = track.getString("name");
 
-                userPlaylists.add(playlistName);
+                recentlyPlayedList.add(nameOfTrack);
             }
 
         } catch (JSONException e) {
@@ -136,8 +136,7 @@ public final class QueryUtils {
             Log.e(LOG_TAG, "Problem parsing the earthquake JSON results", e);
         }
 
-
-        return userPlaylists;
+        return recentlyPlayedList;
     }
 
 }

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -39,12 +41,17 @@ public class HomeActivity extends AppCompatActivity {
         accessToken = intent.getExtras().getString("access-token");
         Log.d("HomeActivity", "Access token is: " + accessToken);
 
+        final Uri baseUriRecently = Uri.parse(CONTENT_URI);
+        String recentlyPlayed = "player/recently-played";
+        Uri updatedRecent = baseUriRecently.withAppendedPath(baseUriRecently, recentlyPlayed);
+        new PlayListAsyncTask().execute(updatedRecent.toString(), accessToken);
+
         mPlaylist = (TextView) findViewById(R.id.tv_playlist);
         mPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("HomeActivity", "Clicked item:" + mPlaylist.getText().toString().toLowerCase());
-                Uri baseUri = Uri.parse(CONTENT_URI);
+                final Uri baseUri = Uri.parse(CONTENT_URI);
                 String uriToAppend = mPlaylist.getText().toString().toLowerCase();
                 Uri updatedUri = baseUri.withAppendedPath(baseUri, uriToAppend);
 
@@ -74,8 +81,15 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("HomeActivity", "Clicked item:" + mSongs.getText().toString().toLowerCase());
+                //baseUri.withAppendedPath(baseUri, "tracks");
             }
         });
+    }
+
+    private void updateUI(List<String> recentlyPlayedList){
+        ArrayAdapter recenlyPlayedAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, recentlyPlayedList);
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setAdapter(recenlyPlayedAdapter);
     }
 
     private class PlayListAsyncTask extends AsyncTask<String ,Void, List<String>> {
@@ -83,9 +97,9 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         protected List<String> doInBackground(String... params) {
 
-            List<String> userPlaylists = QueryUtils.fetchData(params[0], params[1]);
+            List<String> recentlyPlayedList = QueryUtils.fetchData(params[0], params[1]);
 
-            return userPlaylists;
+            return recentlyPlayedList;
         }
 
 
@@ -96,7 +110,7 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<String> strings) {
-            mSongs.setText(strings.toString());
+            updateUI(strings);
         }
     }
 
