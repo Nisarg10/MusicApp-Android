@@ -5,8 +5,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -51,12 +54,6 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("HomeActivity", "Clicked item:" + mPlaylist.getText().toString().toLowerCase());
-                final Uri baseUri = Uri.parse(CONTENT_URI);
-                String uriToAppend = mPlaylist.getText().toString().toLowerCase();
-                Uri updatedUri = baseUri.withAppendedPath(baseUri, uriToAppend);
-
-                Log.d(LOG_TAG, "URL is " + updatedUri.toString());
-                new PlayListAsyncTask().execute(updatedUri.toString(), accessToken);
             }
         });
 
@@ -86,18 +83,21 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUI(List<String> recentlyPlayedList){
-        ArrayAdapter recenlyPlayedAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, recentlyPlayedList);
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setAdapter(recenlyPlayedAdapter);
+    private void updateUI(List<Track> recentlyPlayedList){
+        CustomTrackAdapter recenlyPlayedAdapter = new CustomTrackAdapter(this, recentlyPlayedList);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycle_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(recenlyPlayedAdapter);
+
+
     }
 
-    private class PlayListAsyncTask extends AsyncTask<String ,Void, List<String>> {
+    private class PlayListAsyncTask extends AsyncTask<String ,Void, List<Track>> {
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected List<Track> doInBackground(String... params) {
 
-            List<String> recentlyPlayedList = QueryUtils.fetchData(params[0], params[1]);
+            List<Track> recentlyPlayedList = QueryUtils.fetchData(params[0], params[1]);
 
             return recentlyPlayedList;
         }
@@ -109,7 +109,7 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<String> strings) {
+        protected void onPostExecute(List<Track> strings) {
             updateUI(strings);
         }
     }

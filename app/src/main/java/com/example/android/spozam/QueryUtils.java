@@ -26,7 +26,7 @@ public final class QueryUtils {
 
     private static String LOG_TAG = QueryUtils.class.getSimpleName();
 
-    public static List<String> fetchData(String dataRequested, String accessToken) {
+    public static List<Track> fetchData(String dataRequested, String accessToken) {
 
         URL url = createUrl(dataRequested);
 
@@ -37,7 +37,7 @@ public final class QueryUtils {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
 
-        List<String> userPlaylists = fetchRecentlyPlayed(jsonResponse);
+        List<Track> userPlaylists = fetchRecentlyPlayed(jsonResponse);
 
         return userPlaylists;
     }
@@ -109,9 +109,9 @@ public final class QueryUtils {
         return output.toString();
     }
 
-    private static List<String> fetchRecentlyPlayed(String jsonResponse) {
+    private static List<Track> fetchRecentlyPlayed(String jsonResponse) {
 
-        List<String> recentlyPlayedList = new ArrayList<>();
+        List<Track> recentlyPlayedList = new ArrayList<>();
 
         try
         {
@@ -125,15 +125,16 @@ public final class QueryUtils {
                 JSONObject track = tracks.getJSONObject("track");
 
                 String nameOfTrack = track.getString("name");
+                String uriOfTrack = track.getString("uri");
 
-                recentlyPlayedList.add(nameOfTrack);
+                recentlyPlayedList.add(new Track(nameOfTrack, uriOfTrack));
             }
 
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
-            Log.e(LOG_TAG, "Problem parsing the earthquake JSON results", e);
+            Log.e(LOG_TAG, "Problem parsing the JSON results", e);
         }
 
         return recentlyPlayedList;
