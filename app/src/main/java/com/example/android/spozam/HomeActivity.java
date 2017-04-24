@@ -8,11 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -83,12 +85,11 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void updateUI(List<Track> recentlyPlayedList){
+    private void updateUI(final List<Track> recentlyPlayedList){
         CustomTrackAdapter recenlyPlayedAdapter = new CustomTrackAdapter(this, recentlyPlayedList);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycle_view);
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycle_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recenlyPlayedAdapter);
-
 
     }
 
